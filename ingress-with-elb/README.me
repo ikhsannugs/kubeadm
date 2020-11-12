@@ -1,1 +1,5 @@
-
+1. wget https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.41.0/deploy/static/provider/baremetal/deploy.yaml
+2. add "nodePort: 30080" for http and "nodePort: 30443" for https in service deployment file deploy.yaml
+3. kubectl apply -f deploy.yaml
+4. create certificate with aws certificate manager, add domain name and wildcard, and dns validation
+5. create Aplication Load Balancer with the arn certificate and the 
