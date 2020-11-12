@@ -6,4 +6,4 @@ Environment AWS with EC2
 4. mkdir -p $HOME/.kube; sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config; sudo chown $(id -u):$(id -g) $HOME/.kube/config
 5. kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 
-If you want use another network cidr for pod, adjust network pod too in kube-flannel.yml
+If you want to use another network cidr pod, adjust the network cidr pod in kube-flannel.yml
