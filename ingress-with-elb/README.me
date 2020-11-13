@@ -3,3 +3,6 @@
 3. kubectl apply -f deploy.yaml
 4. create certificate with aws certificate manager, add domain name and wildcard, and dns validation
 5. create Aplication Load Balancer with the arn certificate and the destination port in each nodes
+6. assing the dns application load balancer to recordset a type dns controller
+7. apply rule-ingress
+   kubectl apply -f rule-ingress
