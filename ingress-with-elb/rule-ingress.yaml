@@ -4,14 +4,9 @@ metadata:
   name: hello-world-ingress
   annotations:
     kubernetes.io/ingress.class: nginx
-#    cert-manager.io/cluster-issuer: letsencrypt-staging
     nginx.ingress.kubernetes.io/rewrite-target: /$1
     nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
-#  tls:
-#  - hosts:
-#    - ikhsannugs.xyz
-#    secretName: tls-secret
   rules:
   - host: ikhsannugs.xyz
     http:
