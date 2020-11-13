@@ -19,3 +19,12 @@ Ingress nginx controller with nodeport, external tcp loadbalancer and cert-manag
     kubectl apply -f issuer.yaml
 13. apply the rule ingress
     kubectl apply -f rule-ingress.yaml
+
+
+for config HAProxy
+  haproxy -f /etc/haproxy/haproxy.cfg -c
+  systemctl restart haproxy
+  
+for config nginx
+  nginx -t
+  systemctl restart nginx
