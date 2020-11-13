@@ -1,3 +1,5 @@
+Ingress nginx controller with nodeport, external tcp loadbalancer and cert-manager
+
 1. wget https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.41.0/deploy/static/provider/baremetal/deploy.yaml
 2. add "nodePort: 30080" for http and "nodePort: 30443" for https in service deployment file deploy.yaml
 3. kubectl apply -f deploy.yaml
