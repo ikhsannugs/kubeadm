@@ -25,7 +25,12 @@ sudo systemctl daemon-reload
 sudo systemctl restart docker
 sudo systemctl enable docker
 
-sudo dpkg-reconfigure tzdata
+sudo timedatectl set-timezone Asia/Jakarta
+
+cat <<EOF | sudo tee /etc/timezone
+Asia/Jakarta
+EOF
+sudo dpkg-reconfigure -f noninteractive tzdata
 
 sudo apt-get update && sudo apt-get install -y apt-transport-https curl
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
