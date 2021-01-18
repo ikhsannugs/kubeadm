@@ -10,9 +10,9 @@ If you want to use another network cidr pod, adjust the network cidr pod in kube
 
 Environment LXC
 
-mknod /dev/kmsg c 1 11
-echo 'mknod /dev/kmsg c 1 11' >> /etc/rc.local
-chmod +x /etc/rc.local
+1. mknod /dev/kmsg c 1 11
+2. echo 'mknod /dev/kmsg c 1 11' >> /etc/rc.local
+3. chmod +x /etc/rc.local
 
 kubeadm init --pod-network-cidr=10.244.0.0/16 --ignore-preflight-errors=all --control-plane-endpoint=your-ip-public-master-node
 
