@@ -1,50 +1,43 @@
-#!/bin/bash
-##bootstrap kubeadm in ubuntu
-
-sudo apt-get update && sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common gnupg2
-
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key --keyring /etc/apt/trusted.gpg.d/docker.gpg add -
-
-sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-
-sudo apt-get update && sudo apt-get install -y \
-  containerd.io \
-  docker-ce \
-  docker-ce-cli
-  
-cat <<EOF | sudo tee /etc/docker/daemon.json
-{
-  "exec-opts": ["native.cgroupdriver=systemd"],
-  "log-driver": "json-file",
-  "log-opts": {
-    "max-size": "100m"
-  },
-  "storage-driver": "overlay2"
-}
-EOF
-
-sudo mkdir -p /etc/systemd/system/docker.service.d
-sudo systemctl daemon-reload
-sudo systemctl restart docker
-sudo systemctl enable docker
-
-sudo timedatectl set-timezone Asia/Jakarta
-
-cat <<EOF | sudo tee /etc/timezone
-Asia/Jakarta
-EOF
-sudo dpkg-reconfigure -f noninteractive tzdata
-
-sudo apt-get update && sudo apt-get install -y apt-transport-https curl
-curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-cat <<EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
-deb https://apt.kubernetes.io/ kubernetes-xenial main
-EOF
+pastikan pake sudo atau sudah di posisi root
+#Set HostName
+sudo hostnamectl set-hostname kubemaster
+sudo nano /etc/hosts
+#Install-install
 sudo apt-get update
-sudo apt-get install -y kubeadm=1.20.0-00 kubelet=1.20.0-00 kubectl=1.20.0-00
+sudo apt-get install -y apt-transport-https ca-certificates curl
+sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+sudo apt-get update
+sudo apt-get install -y kubelet kubeadm kubectl
 sudo apt-mark hold kubelet kubeadm kubectl
-
+sudo systemctl enable --now kubelet
+#Disable swap
 sudo swapoff -a
-sudo sed -i '/ swap / s/^/#/' /etc/fstab
-
-
+sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+#Enable kernel module
+sudo modprobe br_netfilter
+sudo modprobe overlay
+cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+net.ipv4.ip_forward = 1
+EOF
+#Install containerd
+cat <<EOF | sudo tee /etc/modules-load.d/containerd.conf
+overlay
+br_netfilter
+EOF
+sudo sysctl --system
+#lakukan restart os terlebih dahulu
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+sudo apt update -y
+sudo apt install -y containerd.io
+sudo mkdir -p /etc/containerd
+containerd config default | sudo tee /etc/containerd/config.toml >/dev/null 2>&1
+sudo sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml
+sudo systemctl restart containerd
+sudo systemctl enable containerd
+containerd -v
+#kubeadm init
+sudo kubeadm init --pod-network-cidr=192.168.0.0/16 --upload-certs --control-plane-endpoint=k8s-lb
