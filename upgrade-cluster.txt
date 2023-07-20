@@ -1,0 +1,32 @@
+#-----upgrade master node------#
+#dijalankan di master tempat pertama upgrade
+sudo apt-mark unhold kubeadm && \
+sudo apt-get update && sudo apt-get install -y kubeadm=1.26.0-00 && \
+sudo apt-mark hold kubeadm
+sudo kubeadm version
+sudo kubeadm upgrade plan v1.26.0
+sudo kubeadm upgrade apply v1.26.0
+sudo kubeadm upgrade node
+#dijalankan di setiap master
+sudo apt-mark unhold kubelet kubectl && \
+sudo apt-get update && sudo apt-get install -y kubelet=1.26.0-00 kubectl=1.26.0-00 && \
+sudo apt-mark hold kubelet kubectl
+sudo systemctl daemon-reload
+sudo systemctl restart kubelet
+
+#-----upgrade worker node-----#
+#dijalankan di setiap worker
+sudo apt-mark unhold kubeadm && \
+sudo apt-get update && sudo apt-get install -y kubeadm=1.26.0-00 && \
+sudo apt-mark hold kubeadm
+sudo kubeadm upgrade node
+#dijalankan di master
+kubectl drain <node-to-drain> --ignore-daemonsets
+#dijalankan di setiap worker
+sudo apt-mark unhold kubelet kubectl && \
+sudo apt-get update && sudo apt-get install -y kubelet=1.26.0-00 kubectl=1.26.0-00 && \
+sudo apt-mark hold kubelet kubectl
+sudo systemctl daemon-reload
+sudo systemctl restart kubelet
+#dijalankan di master
+kubectl uncordon <node-to-ready>
